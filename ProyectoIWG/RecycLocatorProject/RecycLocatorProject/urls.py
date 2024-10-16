@@ -19,6 +19,7 @@ from django.urls import path, include
 from RecycLocator import views
 
 urlpatterns = [
+    path('',views.home),
     path('admin/', admin.site.urls),
     path('map/',views.index)
 ]
