@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--Permite que se muestren correctamente caracteres especiales (acentos, ñ, etc.)-->
     <meta charset="UTF-8">
+
+    <!--Hace  que se ajuste a diferentes tamaños de pantalla la pagina-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Centros de Reciclaje en Chile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
@@ -19,74 +23,27 @@
         .body {
             color: green;
         }
-        /* Estilo para la barra de búsqueda */
-        #search-bar {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-        }
     </style>
+
+    <!--Key de la Api-->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcZ0uPcGrkvQie3ptx2Af8CI4nqSIfpc8&libraries=places"></script>
+    
+    <!--Inicializar el mapa-->
     <script>
         let map;
-        let searchBox;
-
         function initMap() {
             const chileCenter = { lat: -35.6751, lng: -71.542969 }; // Centro aproximado de Chile
             map = new google.maps.Map(document.getElementById("map"), {
                 center: chileCenter,
                 zoom: 5
             });
-
-            // Crear la barra de búsqueda
-            const input = document.getElementById("search-input");
-            searchBox = new google.maps.places.SearchBox(input);
-
-            // Vincular el SearchBox al mapa
-            map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
-            map.addListener("bounds_changed", () => {
-                searchBox.setBounds(map.getBounds());
-            });
-
-            // Manejar los resultados de la búsqueda
-            searchBox.addListener("places_changed", () => {
-                const places = searchBox.getPlaces();
-
-                if (places.length === 0) {
-                    return;
-                }
-
-                // Ajustar la vista del mapa a la ubicación del lugar buscado
-                const bounds = new google.maps.LatLngBounds();
-                places.forEach((place) => {
-                    if (!place.geometry || !place.geometry.location) {
-                        console.log("Returned place contains no geometry");
-                        return;
-                    }
-
-                    const marker = new google.maps.Marker({
-                        map,
-                        position: place.geometry.location,
-                    });
-
-                    if (place.geometry.viewport) {
-                        bounds.union(place.geometry.viewport);
-                    } else {
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                map.fitBounds(bounds);
-            });
         }
     </script>
 </head>
+
 <body onload="initMap()">
-    
-
+    <!--Tamaño del mapa-->
     <div id="map" style="height: 1100px; width: 100%;"></div>
-
-    <div class="card text-center mt-4">
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
