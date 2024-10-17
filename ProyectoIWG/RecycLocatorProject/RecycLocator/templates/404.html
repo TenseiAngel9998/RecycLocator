@@ -4,8 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RecycLocator</title>
+<!--Estilo de Boton que lleva hacia el mapa-->
+<!--Para cambiar la ubicacion del boton cambiar datos de margin para mas o menos pixeles, primer dato es eje y, segundo dato es eje x.-->
+    <style>
+        a{
+            display: block;
+            width: 150px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 200px;
+            background-color: rgb(88, 153, 155);
+            border-radius: 10px;
+            padding: 15px 30px;
+            margin: 550px 1100px;
+            color: #fff;
+            text-decoration: none;
+        }
+        a:hover {
+            background-color: darkcyan;
+            border: 2px solid rgb(88, 153, 155);
+            color: rgb(255, 255, 255);
+        }
+    </style>
 </head>
+<!--Enlace conectado al boton para el mapa-->
 <body>
-    hola bro
+    <a href="http://127.0.0.1:8000/map/" target="_blank">Puntos de Reciclaje</a>
 </body>
 </html>
