@@ -14,16 +14,19 @@ header {
     align-items: center;
 }
 .head {
+    position: absolute;
+    top: 0px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 63px;
+    height: 60px;
     background: #68c93e;
     position: fixed;
     width: 100%;
     z-index: 100;
 }
 .header {
+    margin-top: 110px;
     justify-content: center;
     align-items: center;
 }
@@ -35,6 +38,8 @@ header {
     color: #000;
 }
 .logo {
+    position: absolute;
+    left: 15px;
     margin-bottom: 0px;
     font-size: 30px;
     font-weight: 60;
