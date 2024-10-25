@@ -22,10 +22,27 @@
                 zoom: 5
             });
 
-            // Solicitar la ubicacion
+            // Lista de centros de reciclaje (puntos fijos)
+            const recyclingCenters = [
+                { position: { lat: -33.4489, lng: -70.6693 }, title: "Centro de Reciclaje Santiago" }, // Santiago
+                { position: { lat: -36.8201, lng: -73.0443 }, title: "Centro de Reciclaje Concepción" }, // Concepción
+                { position: { lat: -32.9177, lng: -71.5374 }, title: "Centro de Reciclaje Valparaíso" }, // Valparaíso
+                { position: { lat: -39.8196, lng: -73.2454 }, title: "Centro de Reciclaje Valdivia" } // Valdivia
+            ];
+
+            // Colocar los marcadores en el mapa
+            recyclingCenters.forEach(center => {
+                new google.maps.Marker({
+                    position: center.position,
+                    map: map,
+                    title: center.title
+                });
+            });
+
+            // Solicitar la ubicación del usuario
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    const userLocation= {
+                    const userLocation = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
@@ -40,7 +57,7 @@
                     map.setCenter(userLocation);
                     map.setZoom(15); // Acercar el mapa
                 }, function() {
-                    alert("Error: No se pudo obtener la ubicación")
+                    alert("Error: No se pudo obtener la ubicación");
                 });
             } else {
                 alert("Error: Tu navegador no soporta la localización");
