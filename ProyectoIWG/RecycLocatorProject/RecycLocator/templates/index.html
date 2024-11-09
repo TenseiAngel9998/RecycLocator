@@ -4,7 +4,7 @@
     <!--Permite que se muestren correctamente caracteres especiales (acentos, ñ, etc.)-->
     <meta charset="UTF-8">
 
-    <!--Hace  que se ajuste a diferentes tamaños de pantalla la pagina-->
+    <!--Hace que se ajuste a diferentes tamaños de pantalla la pagina-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Centros de Reciclaje en Chile</title>
@@ -22,39 +22,6 @@
                 zoom: 5
             });
 
-            const request= {
-                location: chileCenter,
-                radius: 200000,
-                keyword: "puntos de reciclaje"
-            };
-
-            // Crea un servicio de Places para buscar lugares de reciclaje
-            const service = new google.maps.places.PlacesService(map);
-            service.nearbySearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    results.forEach(place => {
-                        // Crea un marcador para cada centro de reciclaje
-                        const marker = new google.maps.Marker({
-                            position: place.geometry.location,
-                            map: map,
-                            title: place.name
-                        });
-
-                        // para mostrar el nombre y la dirección del lugar
-                        const infowindow = new google.maps.InfoWindow({
-                            content: `<h5>${place.name}</h5><p>${place.vicinity}</p>`
-                        });
-
-                        // Muestra la info al hacer clic en el marcador
-                        marker.addListener("click", () => {
-                            infowindow.open(map, marker);
-                        });
-                    });
-                } else {
-                    console.error("Error al buscar puntos de reciclaje:", status);
-                }
-            });
-
             // Solicitar la ubicación del usuario
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
@@ -62,6 +29,41 @@
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+
+                    // Configura la búsqueda en torno a la ubicación del usuario
+                    const request = {
+                        location: userLocation, // Se usa la ubicación del usuario
+                        radius: 200000, // Radio de búsqueda (200 km)
+                        keyword: "reciclaje" // Buscar puntos relacionados con reciclaje
+                    };
+
+                    // Crea un servicio de Places para buscar lugares de reciclaje cercanos
+                    const service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch(request, (results, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            results.forEach(place => {
+                                // Crea un marcador para cada centro de reciclaje
+                                const marker = new google.maps.Marker({
+                                    position: place.geometry.location,
+                                    map: map,
+                                    title: place.name
+                                });
+
+                                // Para mostrar el nombre y la dirección del lugar
+                                const infowindow = new google.maps.InfoWindow({
+                                    content: `<h5>${place.name}</h5><p>${place.vicinity}</p>`
+                                });
+
+                                // Muestra la info al hacer clic en el marcador
+                                marker.addListener("click", () => {
+                                    infowindow.open(map, marker);
+                                });
+                            });
+                        } else {
+                            console.error("Error al buscar puntos de reciclaje:", status);
+                        }
+                    });
+
                     // Colocar un marcador en la ubicación del usuario
                     new google.maps.Marker({
                         position: userLocation,
