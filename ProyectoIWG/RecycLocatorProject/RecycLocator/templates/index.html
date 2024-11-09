@@ -22,21 +22,37 @@
                 zoom: 5
             });
 
-            // Lista de centros de reciclaje (puntos fijos)
-            const recyclingCenters = [
-                { position: { lat: -33.4489, lng: -70.6693 }, title: "Centro de Reciclaje Santiago" }, // Santiago
-                { position: { lat: -36.8201, lng: -73.0443 }, title: "Centro de Reciclaje Concepción" }, // Concepción
-                { position: { lat: -32.9177, lng: -71.5374 }, title: "Centro de Reciclaje Valparaíso" }, // Valparaíso
-                { position: { lat: -39.8196, lng: -73.2454 }, title: "Centro de Reciclaje Valdivia" } // Valdivia
-            ];
+            const request= {
+                location: chileCenter,
+                radius: 50000,
+                keyword: "punto de reciclaje"
+            };
 
-            // Colocar los marcadores en el mapa
-            recyclingCenters.forEach(center => {
-                new google.maps.Marker({
-                    position: center.position,
-                    map: map,
-                    title: center.title
-                });
+            // Crea un servicio de Places para buscar lugares de reciclaje
+            const service = new google.maps.places.PlacesService(map);
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    results.forEach(place => {
+                        // Crea un marcador para cada centro de reciclaje
+                        const marker = new google.maps.Marker({
+                            position: place.geometry.location,
+                            map: map,
+                            title: place.name
+                        });
+
+                        // para mostrar el nombre y la dirección del lugar
+                        const infowindow = new google.maps.InfoWindow({
+                            content: `<h5>${place.name}</h5><p>${place.vicinity}</p>`
+                        });
+
+                        // Muestra la info al hacer clic en el marcador
+                        marker.addListener("click", () => {
+                            infowindow.open(map, marker);
+                        });
+                    });
+                } else {
+                    console.error("Error al buscar puntos de reciclaje:", status);
+                }
             });
 
             // Solicitar la ubicación del usuario
