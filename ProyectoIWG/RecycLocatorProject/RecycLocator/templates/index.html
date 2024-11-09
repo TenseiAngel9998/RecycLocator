@@ -15,11 +15,18 @@
     
     <!--Inicializar el mapa-->
     <script>
+        let currentInfoWindow = null;  // Variable global para la ventana de información actual
+        let userMarker = null;
+        let map;  // Hacer que el mapa sea accesible globalmente
+
         function initMap() {
             const chileCenter = { lat: -35.6751, lng: -71.542969 }; // Centro aproximado de Chile
-            const map = new google.maps.Map(document.getElementById("map"), {
+            map = new google.maps.Map(document.getElementById("map"), {
                 center: chileCenter,
-                zoom: 5
+                zoom: 5,
+                mapTypeControlOptions: {
+                    position: google.maps.ControlPosition.BOTTOM_RIGHT
+                }
             });
 
             // Solicitar la ubicación del usuario
@@ -29,6 +36,20 @@
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+
+                    // Crear un círculo para representar la ubicación del usuario (en lugar de un marcador)
+                    userMarker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10, // Tamaño del círculo
+                            fillColor: '#00f0d0', // Color del punto
+                            fillOpacity: 1,
+                            strokeWeight: 0
+                        },
+                        title: "Tu ubicación"
+                    });
 
                     // Configura la búsqueda en torno a la ubicación del usuario
                     const request = {
@@ -49,26 +70,39 @@
                                     title: place.name
                                 });
 
-                                // Para mostrar el nombre y la dirección del lugar
-                                const infowindow = new google.maps.InfoWindow({
-                                    content: `<h5>${place.name}</h5><p>${place.vicinity}</p>`
-                                });
+                                // Crear una ventana de información
+                                const infowindow = new google.maps.InfoWindow();
 
-                                // Muestra la info al hacer clic en el marcador
+                                // Función para cargar la foto del lugar si existe
+                                const loadPhoto = (place) => {
+                                    if (place.photos && place.photos.length > 0) {
+                                        const photo = place.photos[0];
+                                        const photoUrl = photo.getUrl({ maxWidth: 400, maxHeight: 300 });
+                                        return `<img src="${photoUrl}" alt="Foto de ${place.name}" style="width: 200px; height: auto;">`;
+                                    } else {
+                                        return `<p>No hay fotos disponibles.</p>`;
+                                    }
+                                };
+
+                                // Mostrar información con foto al hacer clic en el marcador
                                 marker.addListener("click", () => {
+                                    // Cerrar la ventana de información anterior si está abierta
+                                    if (currentInfoWindow) {
+                                        currentInfoWindow.close();
+                                    }
+                                    const content = `
+                                        <h5>${place.name}</h5>
+                                        <p>${place.vicinity}</p>
+                                        ${loadPhoto(place)}
+                                    `;
+                                    infowindow.setContent(content);
                                     infowindow.open(map, marker);
+                                    currentInfoWindow = infowindow; // Actualizar la ventana de información actual
                                 });
                             });
                         } else {
                             console.error("Error al buscar puntos de reciclaje:", status);
                         }
-                    });
-
-                    // Colocar un marcador en la ubicación del usuario
-                    new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        title: "Tu ubicación"
                     });
 
                     // Mover el mapa a la ubicación del usuario
@@ -81,7 +115,20 @@
                 alert("Error: Tu navegador no soporta la localización");
             }
         }
+
+        // Función para mover el mapa a la ubicación del usuario y hacer zoom progresivo
+        function goToUserLocation() {
+            if (userMarker) {
+                const userLocation = userMarker.getPosition();
+                map.panTo(userLocation); // Centrar el mapa en la ubicación del usuario
+                map.setZoom(17); // Establecer el zoom de forma que se acerque al nivel de la ubicación
+            } else {
+                alert("No se ha detectado la ubicación del usuario.");
+            }
+        }
     </script>
+
+<!--Tamaño del mapa-->
 <style>
     #map {
         height: 100vh;
@@ -92,11 +139,34 @@
         padding: 0;
         height: 100%;
     }
+    #goToLocationButton {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 5;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #goToLocationButton:hover {
+        background-color: #00f0d0;
+    }
+    
+    /* Ocultar copyright y condiciones de Google Maps */
+    .gm-style-cc {
+        display: none !important;
+    }
 </style>
 </head>
 
 <body onload="initMap()">
-    <!--Tamaño del mapa-->
+    <!-- Botón para ir a la ubicación del usuario -->
+    <button id="goToLocationButton" onclick="goToUserLocation()">Ir a mi ubicación</button>
+
+    <!-- Mapa -->
     <div id="map"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
