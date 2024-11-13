@@ -3,85 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="static\css\style.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <title>RecycLocator</title>
 <!--Estilo de Boton que lleva hacia el mapa-->
 <!--Para cambiar la ubicacion del boton cambiar datos de margin para mas o menos pixeles, primer dato es eje y, segundo dato es eje x.-->
 </head>
 <!--Enlace conectado al boton para el mapa-->
-<body>
+<style>
+    body, html {
+        margin: 0;
+        height: 100%;
+        transition: background-color 0.5s ease; /* Suaviza el cambio de fondo */
+    }
 
+    .fullscreen-image {
+        background-image: url("static/img/forest-3622519_1920.jpg");
+        background-size: cover;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-family: monospace;
+        font-size: 4.5rem; /* Tamaño del texto */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+
+    .info {
+        display: none; /* Oculta la información inicialmente */
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        vertical-align: baseline;
+    }
+
+    .head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 63px;
+        background-color: #fff;
+        position: fixed;
+        width: 100%;
+        z-index: 100;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para los cuadrados */
+    }
+
+    .logo {
+        margin-bottom: 0px;
+        font-family: Helvetica;
+        font-size: 30px;
+        font-weight: 60;
+        text-transform: none;
+        color: #fff;
+    }
+
+/* Estilo para el contenedor principal */
+.contenido {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    background: url("static/img/reciclaje-basura.jpg") no-repeat center center;
+    background-size: cover; /* Asegura que la imagen cubra toda el área */
+    position: relative; /* Necesario para posicionar el pseudo-elemento ::after */
+    color: white; /* Asegura que el texto sea visible en el fondo oscuro */
+    z-index: 1; /* Asegura que el texto quede por encima de la niebla */
+    text-align: center; /* Centra el texto dentro del contenedor */
+    font-family: Helvetica, sans-serif;
+    font-size: 2vw; /* El tamaño de fuente se adapta al tamaño de la pantalla */
+    flex-direction: column; /* Los elementos hijos se apilan verticalmente */
+    line-height: 1.5;
+    margin: 0; /* Elimina cualquier margen por defecto */
+    padding: 0; /* Elimina cualquier padding adicional */
+}
+
+/* Pseudo-elemento ::after que crea la niebla */
+.contenido::after {
+    content: '';
+    position: absolute; /* Asegura que se coloque encima de la imagen */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Color negro con opacidad 0.7 */
+    pointer-events: none; /* Evita que el overlay interfiera con los clics */
+    z-index: -1; /* Coloca la niebla debajo del contenido */
+}
+
+a{
+            width: 150px;
+            font-family: Helvetica;
+            font-weight: 200;
+            background-color: green;
+            border-radius: 10px;
+            padding: 15px 30px;
+
+            color: #fff;
+            text-decoration: none;
+        }
+        a:hover {
+            background-color: #009846;
+            border: 2px solid rgb(88, 153, 155);
+            color: rgb(255, 255, 255);
+    }
     
+    .Texto { 
+    background-color: #eff2e3; /* Fondo verde claro */
+    padding: 20px; /* Añade algo de espacio dentro del elemento */
+    color: #333; /* Color del texto para hacerlo más visible */
+    font-size: 1.5rem; /* Tamaño de fuente dentro del texto */
+    margin: 0; /* Elimina cualquier margen por defecto */
+    }
+
+    .beneficios {
+            display: flex;
+            justify-content: center;  /* Centra los cuadrados horizontalmente */
+            align-items: center;      /* Centra los cuadrados verticalmente */
+            margin: 0;
+        }
+
+        .contenedor {
+            display: flex;                /* Usamos flexbox para alinear los cuadrados */
+            justify-content: space-between; /* Asegura que haya espacio entre los cuadrados */
+            width: 90%;                    /* El contenedor ocupa el 90% del ancho de la pantalla */
+        }
+
+        .cuadrado {
+            flex: 1;                      /* Cada cuadrado ocupa el mismo espacio */
+            height: 150px;                /* Altura de 150px */
+            margin: 0 10px;               /* Espacio horizontal entre los cuadrados */
+            background-color: white;     /* Fondo blanco por defecto */
+            border-radius: 20px;         /* Bordes redondeados con un radio de 20px */
+            box-sizing: border-box;      /* Asegura que el padding y borde no afecten el tamaño total */
+            display: flex;               /* Flexbox dentro de cada cuadrado */
+            flex-direction: column;      /* Alineación vertical de los hijos */
+            justify-content: center;     /* Centra el contenido verticalmente */
+            align-items: center;         /* Centra el contenido horizontalmente */
+            font-size: 20px;             /* Tamaño de la fuente */
+            color: black;               /* Color del texto en negro */
+            font-weight: bold;          /* Texto en negrita */
+            transition: all 0.3s ease;  /* Transición suave para el cambio de color */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para los cuadrados */
+            font-family: Helvetica;
+        }
+
+        .cuadrado:hover {
+            background-color: green;    /* Cambia el fondo a verde cuando el mouse está sobre el cuadrado */
+            color: white;               /* Cambia el color del texto a blanco */
+        }
+
+        .icono {
+            font-size: 30px;            /* Tamaño del icono */
+            margin-bottom: 10px;        /* Espacio entre el icono y el texto */
+            color: green;
+        }
+
+        .cuadrado:hover .icono {
+            color: white;               /* Cambia el color de los iconos a blanco */
+        }
+
+    .title {
+        text-align: center; /* Centra el texto dentro del contenedor */
+        font-family: Helvetica;
+        margin-bottom: 40px;
+        font-size: 3vw;
+        font-weight: 6000;
+        text-transform: uppercase;
+        color: #000;
+    }
+    p {
+        font-family: Helvetica;
+        margin-bottom: 40px;
+        color: #000;
+        padding: 0 100px;
+    }
+
+    .img1 {
+        display: block;
+        margin: 0 40%;
+    }
+
+    .box-container {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+    }
+
+
+    .box-container .arrow{
+        background-color:  #c1ff72; /* Color de fondo */
+        text-align: center;
+        color: black; /* Color de texto */
+        padding: 2px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 20px 20px;
+        transition: height 0.3s ease; /* Transición suave */
+    }
+
+    .dentro{
+        font-size: 25px;
+
+        
+    }
+
+
+</style>
+
+<body>
+<div class="fullscreen-image" onclick="showInfo()">
+
+        <h1><i class="fas fa-recycle"></i> RecycLocator</h1><br>
+
+</div>
+
+
+<div class="info" id="info">
     <div class="head">
 
-        <div class="logo">
-
+        <div class="logo" style="color: green;margin-left: 15px;">
             <i class="fas fa-recycle"></i> 
-            <span class="texto">RecycLocator</span>
-            
+            <span class="texto"> RecycLocator</span>             
         </div>
-
     </div>
 
-    <header class="content header">
-        <h2 class="title">¿Qué es el reciclaje?</h2>
-        <p>El reciclaje es el proceso de recolectar desechos o 
+    <div class="contenido">
+        <h1>¡Todo sobre donde y como reciclar aquí!</h1>
+        <h4>Busca el punto de reciclaje más cercano a ti, 
+            y descubre <br><br> la forma correcta de reciclar todo 
+            en un solo lugar.</h4>
+            <a href="http://127.0.0.1:8000/map/" target="_blank">Puntos de Reciclaje</a>
+    </div>
+
+
+    <div class="Texto">
+
+        <h2 class="title" style="color: green;">¿Qué es el reciclaje?</h2>
+        <p style="color: #545454;">El reciclaje es el proceso de recolectar desechos o 
             materiales desechados y convertirlos en nuevos productos
             o materiales para su reutilización.
-        </p>
-        <figure class="img">
-            <img src="static\img\Reciclar.png" height="216px" width="300px" alt="Elementos del reciclaje">
-        </figure>
-        <p>La importancia del reciclaje está en que este tiene múltiples beneficios:
-        </p>
-        <p>1. Ahorra agua y energía.<br><br>2. Reduce los basurales.
-        <br><br>3. Minimiza el consumo de recursos naturales.<br><br>
-        4. Reduce las emisiones de CO2.</p>
-
-        <figure class="img">
-
-            <img src="static\img\Agua2.png" height="150px" width="205px" alt="Cuidado del Agua">
-            <img src="static\img\Basurales.png" height="115px" width="205px" alt="Basural">
-
-        </figure>
-
-        <figure class="img">
-            <img src="static\img\co2.png" height="115px" width="170px" alt="Emisiones de CO2">
-            <img src="static\img\energia.png" height="115px" width="150px" alt="Energia limpia">
-        </figure>
-        <p>Algunos materiales que comúnmente se reciclan son:</p>
-        <p>El papel, el cartón, distintos tipos de plasticos, el vidrio, 
-            los metales, diversos objetos electrónicos, los textiles, la madera, 
-            entre otros.
+            <br><br>
+            La importancia del reciclaje está en que este tiene múltiples beneficios:
         </p>
         
+        <div class="beneficios">
+            <div class="contenedor">
+                <div class="cuadrado">
+                    <i class="fas fa-tint icono" title="Agua"></i> <!-- Icono de agua -->
+                    <span>Ahorra agua y energía</span>
+                </div>
+                <div class="cuadrado">
+                    <i class="fas fa-trash-alt icono" title="Basura"></i> <!-- Icono de basurero -->
+                    <span>Reduce los basurales</span>
+                </div>
+                <div class="cuadrado">
+                    <i class="fas fa-leaf icono" title="Naturaleza"></i> <!-- Icono de hoja -->
+                    <span>Minimiza el consumo de recursos naturales</span>
+                </div>
+                <div class="cuadrado">
+                    <i class="fas fa-industry icono" title="Fábrica"></i> <!-- Icono de fábrica -->
+                    <span>Reduce las emisiones de CO2</span>
+                </div>
+            </div>
+        </div>
 
-    </header>
-
-    <section class="content sau">
-
-        <h2 class="title">¿Qué objetos podemos reciclar? y ¿Cómo podemos hacerlo?</h2>
-        <p>Muchos, por no decir la mayoria de los objetos que tenemos en nuestra casa
-            se pueden reciclar.
+        </figure>
+        <p style="color: #545454;">Algunos materiales que comúnmente se reciclan son:</p>
+        <p style="color: #545454;">El papel, el cartón, distintos tipos de plasticos, el vidrio, 
+        los metales, los textiles, la madera, diversos objetos electrónicos, entre otros.
         </p>
-        <p>A continuación nombraremos algunos objetos que seguramente 
-            alguna vez has tenido en tu casa, ademas se te diremos la forma correcta
-            de llevarlos a un centro de reciclaje.
-        </p>
-        
+    </div>
+
+    <h2 class="title">¿Qué objetos podemos reciclar? y ¿Cómo podemos hacerlo?</h2>
+    <p>Muchos, por no decir la mayoria de los objetos que tenemos en nuestra casa
+        se pueden reciclar.
+    </p>
+    <p>A continuación nombraremos algunos objetos que seguramente 
+        alguna vez has tenido en tu casa, ademas se te diremos la forma correcta
+        de llevarlos a un centro de reciclaje.
+    </p>
+
     <div class="box-container">
 
         <div class="arrow">
             <details>
             <summary style="cursor: pointer; font-weight: bold;">
-                <h3>Botellas y envases de plástico</h3>
+                <h3 class="dentro">Botellas y envases de plástico</h3>
             </summary>
                 <div class="box">
                 <p>Como reciclarla</p>
-                <figure class="img"><img src="static\img\palstico.png" height="90px" 
+                <figure class="img"><img src="static/img/palstico.png" height="90px" 
                     width="160px" alt="Plasticos">
                 </figure>
                 </div>
@@ -91,11 +310,11 @@
         <div class="arrow">
             <details>
                 <summary style="cursor: pointer; font-weight: bold;">
-                    <h3></i> Latas de aluminio</h3>
+                    <h3 class="dentro"></i> Latas de aluminio</h3>
                 </summary>
                 <div class="box">
                     <p>Como reciclarla</p>
-                    <figure class="img"><img src="static\img\latas.png" height="105px" 
+                    <figure class="img"><img src="static/img/latas.png" height="105px" 
                         width="160px" alt="Latas de aluminio">
                     </figure>
                 </div>
@@ -105,12 +324,12 @@
         <div class="arrow">
             <details>
                 <summary style="cursor: pointer; font-weight: bold;">
-                    <h3></i> Frascos de vidrio</h3>
+                    <h3 class="dentro"></i> Frascos de vidrio</h3>
                 </summary>
                 <div class="box">
                     <p>Como reciclarla</p>
-                    <figure class="img">
-                        <img src="static\img\frasco de vidrio.png" height="122px" width="160px" alt="Frascos de vidrio">                       
+                    <figure class="img"><img src="static/img/frasco de vidrio.png" height="122px" 
+                        width="160px" alt="Frascos de vidrio">                       
                      </figure>
                 </div>
             </details>
@@ -119,11 +338,11 @@
         <div class="arrow">
             <details>
                 <summary style="cursor: pointer; font-weight: bold;">
-                    <h3></i> Periódicos y cartones</h3>
+                    <h3 class="dentro"></i> Periódicos y cartones</h3>
                 </summary>
                 <div class="box">
                     <p>Como reciclarla</p>
-                    <figure class="img"><img src="static\img\cajas de carton.png" height="128px" 
+                    <figure class="img"><img src="static/img/cajas de carton.png" height="128px" 
                         width="160px" alt="Cajas de cartón">
                     </figure>        
                 </div>
@@ -133,40 +352,24 @@
         <div class="arrow">
             <details>
                 <summary style="cursor: pointer; font-weight: bold;">
-                    <h3></i> Teléfonos móviles</h3>
+                    <h3 class="dentro"></i> Teléfonos móviles</h3>
                 </summary>
                 <div class="box">
                     <p>Como reciclarla</p>
-                    <figure class="img"><img src="static\img\celus.png" height="122px" 
+                    <figure class="img"><img src="static/img/celus.png" height="122px" 
                         width="160px" alt="Celulares">
                     </figure>       
                 </div>
             </details>
-        </div>         
+        </div>
     </div>
+</div>
 
-    <style>
-        a{
-            display: block;
-            width: 150px;
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: 200px;
-            background-color: rgb(88, 153, 155);
-            border-radius: 10px;
-            padding: 15px 30px;
-            margin: 115px 46%;
-            color: #fff;
-            text-decoration: none;
-        }
-        a:hover {
-            background-color: darkcyan;
-            border: 2px solid rgb(88, 153, 155);
-            color: rgb(255, 255, 255);
-        }
-    </style>
-
-    <a href="http://127.0.0.1:8000/map/" target="_blank">Puntos de Reciclaje</a>
-
+<script>  /* Permite que la pantalla incial se esconda */
+    function showInfo() {
+        document.querySelector('.fullscreen-image').style.display = 'none'; // Oculta el fondo
+        document.getElementById('info').style.display = 'block'; // Muestra la información
+    }
+</script>
 </body>
 </html>
-

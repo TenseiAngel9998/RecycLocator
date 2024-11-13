@@ -80,12 +80,8 @@ WSGI_APPLICATION = 'RecycLocatorProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  
-        'NAME': 'Recyclocator',                      
-        'USER': 'postgres',                         
-        'PASSWORD': 'Recyclocator',                
-        'HOST': 'localhost',                        
-        'PORT': '5432',     #->puerto predeterminado                       
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',                     
     }
 }
 
