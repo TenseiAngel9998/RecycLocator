@@ -11,9 +11,8 @@
     <script>
         let currentInfoWindow = null;
         let userMarker = null;
+        let tempMarker = null;
         let map;
-        let recyclingMarkers = []; // Array para almacenar los marcadores de reciclaje
-        let clickMarker = null; // Marcador para el punto clickeado
 
         function initMap() {
             const chileCenter = { lat: -35.6751, lng: -71.542969 };
@@ -32,7 +31,7 @@
                         lng: position.coords.longitude
                     };
 
-                    // Crear el marcador circular
+                    // Crear y fijar el marcador inicial del usuario
                     userMarker = new google.maps.Marker({
                         position: userLocation,
                         map: map,
@@ -40,43 +39,31 @@
                         title: "Tu ubicación"
                     });
 
-                    map.addListener("zoom_changed", () => {
-                        const zoomLevel = map.getZoom();
-                        userMarker.setIcon(getCircleIcon(zoomLevel));
-                    });
+                    map.setCenter(userLocation);
+                    map.setZoom(15);
 
-                    // Configura la búsqueda de lugares de reciclaje cercanos
-                    const service = new google.maps.places.PlacesService(map);
-                    
-                    map.addListener("click", (event) => {
-                        clearRecyclingMarkers(); // Elimina marcadores de reciclaje previos
-                        
-                        // Borra el marcador anterior de clic, si existe
-                        if (clickMarker) {
-                            clickMarker.setMap(null);
-                        }
+                    // Cargar puntos de reciclaje iniciales cercanos
+                    loadRecyclingPoints(userLocation);
 
-                        // Crea un marcador especial para el nuevo punto clickeado
-                        clickMarker = new google.maps.Marker({
+                    // Detectar clics en el mapa para agregar un marcador temporal
+                    map.addListener("click", function(event) {
+                        if (tempMarker) tempMarker.setMap(null);
+                        tempMarker = new google.maps.Marker({
                             position: event.latLng,
                             map: map,
                             icon: {
                                 path: google.maps.SymbolPath.CIRCLE,
                                 scale: 10,
-                                fillColor: '#FF0000',
-                                fillOpacity: 0.8,
-                                strokeColor: '#000',
+                                fillColor: '#ff0000',
+                                fillOpacity: 1,
+                                strokeColor: '#000000',
                                 strokeWeight: 2
                             },
-                            title: "Punto seleccionado"
+                            title: "Nueva ubicación seleccionada"
                         });
 
-                        // Configura la búsqueda de reciclaje en el nuevo punto clickeado
-                        searchRecyclingCenters(service, event.latLng);
+                        loadRecyclingPoints(event.latLng);
                     });
-
-                    map.setCenter(userLocation);
-                    map.setZoom(15);
                 }, function() {
                     alert("Error: No se pudo obtener la ubicación");
                 });
@@ -85,18 +72,14 @@
             }
         }
 
-        function clearRecyclingMarkers() {
-            recyclingMarkers.forEach(marker => marker.setMap(null)); // Oculta todos los marcadores
-            recyclingMarkers = []; // Vacía el array
-        }
-
-        function searchRecyclingCenters(service, location) {
+        function loadRecyclingPoints(location) {
             const request = {
                 location: location,
-                radius: 10000,
+                radius: 200000,
                 keyword: "reciclaje"
             };
 
+            const service = new google.maps.places.PlacesService(map);
             service.nearbySearch(request, (results, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
                     results.forEach(place => {
@@ -105,7 +88,6 @@
                             map: map,
                             title: place.name
                         });
-                        recyclingMarkers.push(marker);
 
                         const infowindow = new google.maps.InfoWindow();
 
@@ -154,6 +136,22 @@
                 strokeWeight: 2
             };
         }
+
+        // Alternar entre vista de mapa y satélite
+        function toggleMapType() {
+            const currentType = map.getMapTypeId();
+            map.setMapTypeId(currentType === "roadmap" ? "satellite" : "roadmap");
+        }
+
+        // Centrar el mapa en la ubicación inicial del usuario
+        function centerOnUserLocation() {
+            if (userMarker) {
+                map.setCenter(userMarker.getPosition());
+                map.setZoom(15);
+            } else {
+                alert("Ubicación del usuario no disponible.");
+            }
+        }
     </script>
 
     <style>
@@ -176,7 +174,7 @@
             gap: 10px;
         }
 
-        .custom-map-type-button, #goToLocationButton {
+        .custom-map-type-button {
             width: 200px;
             padding: 10px;
             background-color: #007bff;
@@ -187,12 +185,8 @@
             font-size: 14px;
         }
 
-        .custom-map-type-button:hover, #goToLocationButton:hover {
+        .custom-map-type-button:hover {
             background-color: #00f0d0;
-        }
-
-        .gm-style-cc {
-            display: none !important;
         }
     </style>
 </head>
@@ -200,7 +194,7 @@
 <body onload="initMap()">
     <div class="button-container">
         <button class="custom-map-type-button" onclick="toggleMapType()">Mapa/Satélite</button>
-        <button id="goToLocationButton" onclick="goToUserLocation()">Ir a mi ubicación</button>
+        <button class="custom-map-type-button" onclick="centerOnUserLocation()">Centrar en mi ubicación</button>
     </div>
     <div id="map"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
