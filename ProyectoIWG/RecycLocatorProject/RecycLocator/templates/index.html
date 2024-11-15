@@ -12,15 +12,17 @@
         let currentInfoWindow = null;
         let userMarker = null;
         let map;
+        let recyclingMarkers = []; // Array para almacenar los marcadores de reciclaje
+        let clickMarker = null; // Marcador para el punto clickeado
 
         function initMap() {
             const chileCenter = { lat: -35.6751, lng: -71.542969 };
             map = new google.maps.Map(document.getElementById("map"), {
                 center: chileCenter,
                 zoom: 5,
-                mapTypeControl: false, // Desactiva el control predeterminado de tipo de mapa
-                streetViewControl: false, // Desactiva el control de vista en calle
-                fullscreenControl: false // Desactiva el control de pantalla completa
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
             });
 
             if (navigator.geolocation) {
@@ -38,65 +40,39 @@
                         title: "Tu ubicación"
                     });
 
-                    // Ajusta el tamaño del círculo cuando cambia el zoom
                     map.addListener("zoom_changed", () => {
                         const zoomLevel = map.getZoom();
                         userMarker.setIcon(getCircleIcon(zoomLevel));
                     });
 
                     // Configura la búsqueda de lugares de reciclaje cercanos
-                    const request = {
-                        location: userLocation,
-                        radius: 200000,
-                        keyword: "reciclaje"
-                    };
-
                     const service = new google.maps.places.PlacesService(map);
-                    service.nearbySearch(request, (results, status) => {
-                        if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            results.forEach(place => {
-                                const marker = new google.maps.Marker({
-                                    position: place.geometry.location,
-                                    map: map,
-                                    title: place.name
-                                });
-
-                                const infowindow = new google.maps.InfoWindow();
-
-                                const loadPhoto = (place) => {
-                                    if (place.photos && place.photos.length > 0) {
-                                        const photo = place.photos[0];
-                                        const photoUrl = photo.getUrl({ maxWidth: 400, maxHeight: 300 });
-                                        return `
-                                            <div style="display: flex; justify-content: center; align-items: center; text-align: center; width: 100%; height: 300px; overflow: hidden;">
-                                                <img src="${photoUrl}" alt="Foto de ${place.name}" style="width: 100%; height: 100%; object-fit: cover;"> 
-                                            </div>
-                                        `;
-                                    } else {
-
-                                        return `<p>No hay fotos disponibles.</p>`;
-                                    }
-                                };
-
-
-                                marker.addListener("click", () => {
-                                    if (currentInfoWindow) {
-                                        currentInfoWindow.close();
-                                    }
-                                    const content = `
-                                        <h5>${place.name}</h5>
-                                        <p>${place.vicinity}</p>
-                                        ${loadPhoto(place)}
-                                    `;
-
-                                    infowindow.setContent(content);
-                                    infowindow.open(map, marker);
-                                    currentInfoWindow = infowindow;
-                                });
-                            });
-                         } else {
-                            console.error("Error al buscar puntos de reciclaje:", status);
+                    
+                    map.addListener("click", (event) => {
+                        clearRecyclingMarkers(); // Elimina marcadores de reciclaje previos
+                        
+                        // Borra el marcador anterior de clic, si existe
+                        if (clickMarker) {
+                            clickMarker.setMap(null);
                         }
+
+                        // Crea un marcador especial para el nuevo punto clickeado
+                        clickMarker = new google.maps.Marker({
+                            position: event.latLng,
+                            map: map,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 10,
+                                fillColor: '#FF0000',
+                                fillOpacity: 0.8,
+                                strokeColor: '#000',
+                                strokeWeight: 2
+                            },
+                            title: "Punto seleccionado"
+                        });
+
+                        // Configura la búsqueda de reciclaje en el nuevo punto clickeado
+                        searchRecyclingCenters(service, event.latLng);
                     });
 
                     map.setCenter(userLocation);
@@ -109,24 +85,64 @@
             }
         }
 
-        function goToUserLocation() {
-            if (userMarker) {
-                const userLocation = userMarker.getPosition();
-                map.panTo(userLocation);
-                map.setZoom(17);
-                userMarker.setIcon(getCircleIcon(17));
-            } else {
-                alert("No se ha detectado la ubicación del usuario.");
-            }
+        function clearRecyclingMarkers() {
+            recyclingMarkers.forEach(marker => marker.setMap(null)); // Oculta todos los marcadores
+            recyclingMarkers = []; // Vacía el array
         }
 
-        // Alterna entre "Mapa" y "Satélite"
-        function toggleMapType() {
-            const currentMapType = map.getMapTypeId();
-            map.setMapTypeId(currentMapType === 'roadmap' ? 'satellite' : 'roadmap');
+        function searchRecyclingCenters(service, location) {
+            const request = {
+                location: location,
+                radius: 10000,
+                keyword: "reciclaje"
+            };
+
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    results.forEach(place => {
+                        const marker = new google.maps.Marker({
+                            position: place.geometry.location,
+                            map: map,
+                            title: place.name
+                        });
+                        recyclingMarkers.push(marker);
+
+                        const infowindow = new google.maps.InfoWindow();
+
+                        const loadPhoto = (place) => {
+                            if (place.photos && place.photos.length > 0) {
+                                const photo = place.photos[0];
+                                const photoUrl = photo.getUrl({ maxWidth: 400, maxHeight: 300 });
+                                return `
+                                    <div style="display: flex; justify-content: center; align-items: center; text-align: center; width: 100%; height: 300px; overflow: hidden;">
+                                        <img src="${photoUrl}" alt="Foto de ${place.name}" style="width: 100%; height: 100%; object-fit: cover;"> 
+                                    </div>
+                                `;
+                            } else {
+                                return `<p>No hay fotos disponibles.</p>`;
+                            }
+                        };
+
+                        marker.addListener("click", () => {
+                            if (currentInfoWindow) {
+                                currentInfoWindow.close();
+                            }
+                            const content = `
+                                <h5>${place.name}</h5>
+                                <p>${place.vicinity}</p>
+                                ${loadPhoto(place)}
+                            `;
+                            infowindow.setContent(content);
+                            infowindow.open(map, marker);
+                            currentInfoWindow = infowindow;
+                        });
+                    });
+                } else {
+                    console.error("Error al buscar puntos de reciclaje:", status);
+                }
+            });
         }
 
-        // Función para obtener el tamaño del icono circular basado en el nivel de zoom
         function getCircleIcon(zoomLevel) {
             const scale = zoomLevel >= 15 ? 8 : Math.max(2, 10 - zoomLevel / 2);
             return {
@@ -150,19 +166,18 @@
             padding: 0;
             height: 100%;
         }
-        /* Contenedor de los botones */
         .button-container {
             position: absolute;
             top: 20px;
             left: 20px;
             z-index: 10;
             display: flex;
-            flex-direction: column; /* Organiza los botones verticalmente */
-            gap: 10px; /* Espacio entre los botones */
+            flex-direction: column;
+            gap: 10px;
         }
 
         .custom-map-type-button, #goToLocationButton {
-            width: 200px; /* Igualar el tamaño de los botones */
+            width: 200px;
             padding: 10px;
             background-color: #007bff;
             color: white;
@@ -176,11 +191,9 @@
             background-color: #00f0d0;
         }
 
-        /* Ocultar copyright y condiciones de Google Maps */
         .gm-style-cc {
             display: none !important;
         }
-
     </style>
 </head>
 
