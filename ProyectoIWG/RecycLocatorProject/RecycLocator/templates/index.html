@@ -38,9 +38,14 @@
                         icon: getCircleIcon(map.getZoom()),
                         title: "Tu ubicación"
                     });
+                    
+                    map.addListener("zoom_changed", () => {
+                        const zoomLevel = map.getZoom();
+                        userMarker.setIcon(getCircleIcon(zoomLevel));
+                    }); 
 
                     map.setCenter(userLocation);
-                    map.setZoom(15);
+                    map.setZoom(16);
 
                     // Cargar puntos de reciclaje iniciales cercanos
                     loadRecyclingPoints(userLocation);
@@ -183,10 +188,11 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.7)
         }
 
         .custom-map-type-button:hover {
-            background-color: #00f0d0;
+            background-color: blue;
         }
     </style>
 </head>
