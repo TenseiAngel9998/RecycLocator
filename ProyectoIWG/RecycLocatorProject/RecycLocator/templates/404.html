@@ -304,16 +304,37 @@
     text-align: center;
     }
 
-    .contacto{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center; /* Centra el texto dentro del contenedor */
-        font-family: Helvetica;
-        background-color: green; /* Fondo verde claro */
-        padding: 10px; /* Añade algo de espacio dentro del elemento */
-        margin: 0; /* Elimina cualquier margen por defecto */
+    .contacto {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: Helvetica, sans-serif;
+    background-color: green;
+    padding: 20px;
+    margin: 0;
+    overflow: hidden; /* Evita la barra de desplazamiento */
     }
+
+    .nombre {
+        display: flex; /* Hacemos que los párrafos estén en una sola fila */
+        justify-content: flex-start; /* Alinea los elementos al principio */
+        gap: 5px; /* Reduce el espacio entre los párrafos, puedes ajustarlo */
+        flex-wrap: nowrap; /* Evita que los elementos se envuelvan a una nueva línea */
+        width: 100%; /* Asegura que ocupe el 100% del ancho disponible */
+        box-sizing: border-box; /* Evita el desbordamiento causado por el padding */
+        overflow: hidden; /* Asegura que no haya barras de desplazamiento */
+    }
+
+    .nombre p {
+        color: #fff; /* Color blanco para los textos */
+        font-size: 11.5px; /* Tamaño de la fuente */
+        margin: 0; /* Elimina márgenes adicionales */
+        white-space: nowrap; /* Evita que los textos se dividan en varias líneas */
+    }
+
+
 
     .title {
         text-align: center; /* Centra el texto dentro del contenedor */
@@ -474,10 +495,15 @@
     </div>
 
     <div class="contacto">
-        <h3 style="color: #fff;"> Desarolladores</h3>
-        <p style="color: #fff;">Francisco Baptista<br><br>Ángel Berrios<br><br>Ismael 
-            Castillo<br><br>Cristóbal Flores<br><br>Camila Vásquez</p>
-    </div>
+        <h3 style="color: #fff;">Desarrolladores</h3>
+        <div class="nombre">
+            <p>Francisco Baptista<br><br>fbaptista@usm.cl</p>
+            <p>Ángel Berrios<br><br>aberrios@usm.cl</p>
+            <p>Ismael Castillo<br><br>icastillod@usm.cl</p>
+            <p>Cristóbal Flores<br><br>cfloresc@usm.cl</p>
+            <p>Camila Vásquez<br><br>cvasquezc@usm.cl</p>
+        </div>
+    </div>    
 </div>
 
 <script>  /* Permite que la pantalla incial se esconda */
